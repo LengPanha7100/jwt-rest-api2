@@ -1,0 +1,36 @@
+services:
+  jwt-rest-api2-postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: jwt_rest_api2_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
+    volumes:
+      - jwt-rest-api2-postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5456:5432"
+    networks:
+      - jwt-rest-api2-network
+
+  jwt-rest-api2-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8083:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://jwt-rest-api2-postgres:5432/jwt_rest_api2_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 12345
+    depends_on:
+      - jwt-rest-api2-postgres
+    networks:
+      - jwt-rest-api2-network
+
+volumes:
+  jwt-rest-api2-postgres-data:
+networks:
+  jwt-rest-api2-network:
+    driver: bridge
